@@ -16,45 +16,42 @@
 </head>
 <body>
 
+    <div id="container">
 
+        <header>
+            <h1>Currency Converter </h1>
+            <p>Enter your amount and select currencies to convert</p>
+        </header>
 
+        <div class="input_div">
 
-<div id="container">
+            <label for="amount">Enter amount:</label>
+            <input id="amount" name="currency" type="number" min="1" value="0.00"> <br>
 
-    <header>
-        <h1>Currency Converter </h1>
-        <p>Enter your amount and select currencies to convert</p>
-    </header>
+            <label for="currency_from">From:</label>
+            <select id="currency_from" class="currency_convert_from"></select>
 
-    <div class="input_div">
+            <label for="currency_to">To:</label>
+            <select id="currency_to" class="currency_convert_to"></select>
 
-        <label for="amount">Enter amount:</label>
-        <input id="amount" name="currency" type="number" min="1" value="0.00"> <br>
+            <input id="convert_currency" type="submit" value="Convert Currency">
 
-        <label for="currency_from">From:</label>
-        <select id="currency_from" class="currency_convert_from"></select>
+        </div>
 
-        <label for="currency_to">To:</label>
-        <select id="currency_to" class="currency_convert_to"></select>
+        <div class="output_div">
 
-        <input id="convert_currency" type="submit" value="Convert Currency">
+            <label for="original_currency">Original Currency</label>
+            <input type="text" name="original_currency" id="original_currency" width="100px; disabled="true"></input>
+
+            <label for="converted_currency">Converted Currency</label>
+            <input type="text" name="converted_currency" id="converted_currency" width="100px; disabled="true"></input>
+
+        </div>
+
+        <footer>Mdrizy96</footer>
 
     </div>
 
-    <div class="output_div">
-
-        <label for="original_currency">Original Currency</label>
-        <input type="text" name="original_currency" id="original_currency" width="100px; disabled="true"></input>
-
-        <label for="converted_currency">Converted Currency</label>
-        <input type="text" name="converted_currency" id="converted_currency" width="100px; disabled="true"></input>
-
-    </div>
-
-    <footer>Mdrizy96</footer>
-
-</div>
-
-<script src="js/index.js"></script>
+    <script src="js/index.js"></script>
 </body>
 </html>
