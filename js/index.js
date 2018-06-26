@@ -39,9 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // get currencies list from api
     function fetchListOfCurrencies() {
         fetch(endpoint)
-            .then(res => res.json())
-            .then(data => {
-                const currencies = Object.keys(data.results).sort();
+            .then(response => response.json())
+            .then(myJson => {
+                const currencies = Object.keys(myJson.results).sort();
 
                 addCurrenciesToSelect(currencies);
             })
@@ -59,10 +59,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         fetch(url)
-            .then(res => res.json())
-            .then(data => {
+            .then(response => response.json())
+            .then(myJson => {
                 const inputAmount = getInput();
-                const exchangeRate = Object.values(data);
+                const exchangeRate = Object.values(myJson);
 
                 calculateExchangeRate(...exchangeRate, inputAmount);
             })
