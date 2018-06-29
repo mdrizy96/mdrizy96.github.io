@@ -1,4 +1,8 @@
-// import idb from 'idb';
+import idb from 'idb';
+
+if (!window.indexedDB) {
+    window.alert("Your browser doesn't support a stable version of IndexedDB. Such and such feature will not be available.");
+}
 
 function IDB() {
     this._dbPromise = this._setupDB();
