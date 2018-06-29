@@ -1,5 +1,3 @@
-// we'll version our cache (and learn how to delete caches in
-// some other post)
 var staticCacheName = 'converter-v1';
 var allCaches = [
     staticCacheName
@@ -7,7 +5,7 @@ var allCaches = [
 // const cacheName = 'v1::static';
 
 self.addEventListener('install', e => {
-    // once the SW is installed, go ahead and fetch the resources
+    // once the SW is installed, fetch the resources
     // to make this work offline
     e.waitUntil(
         caches.open(staticCacheName).then(cache => {
@@ -39,11 +37,12 @@ self.addEventListener('activate', e => {
 });
 
 
-
 // when the browser fetches a url, either response with
-// the cached object or go ahead and fetch the actual url
-self.addEventListener('fetch', event => {
-    var requestUrl = new URL(event.request.url);
+// the cached object or fetch the actual url
+self.addEventListener('fetch', e => {
+    console.log('[ServiceWorker] Fetch', e.request.url);
+
+    let requestUrl = new URL(event.request.url);
 
     if (requestUrl.origin === location.origin) {
         if (requestUrl.pathname === '/') {
@@ -52,17 +51,68 @@ self.addEventListener('fetch', event => {
         }
     }
 
-    event.respondWith(
-        // ensure we check the *right* cache to match against
-        caches.match(event.request).then(res => {
-            return res || fetch(event.request)
-        })
+    // e.respondWidth Responds to the fetch event
+    e.respondWith(
+        // Check in cache for the request being made
+        caches.match(e.request)
+            .then(response => {
+                // If the request is in the cache
+                if (response) {
+                    console.log("[ServiceWorker] Found in Cache", e.request.url, response);
+                    // Return the cached version
+                    return response;
+                }
 
-    );
-});
+                // If the request is NOT in the cache, fetch and cache
 
-// self.addEventListener('message', event => {
-//     if (event.data.action === 'skipWaiting') {
-//         self.skipWaiting();
+                let requestClone = e.request.clone();
+                return fetch(requestClone)
+                    .then(response => {
+
+                        if ( !response ) {
+                            console.log("[ServiceWorker] No response from fetch ")
+                            return response;
+                        }
+
+                        let responseClone = response.clone();
+
+                        //  Open the cache
+                        caches.open(staticCacheName).then(cache => {
+
+                            // Put the fetched response in the cache
+                            cache.put(e.request, responseClone);
+                            console.log('[ServiceWorker] New Data Cached', e.request.url);
+
+                            // Return the response
+                            return response;
+
+                        }); // end caches.open
+
+                    })
+                    .catch(err => {
+                        console.log('[ServiceWorker] Error Fetching & Caching New Data', err);
+                    });
+
+            }) // end caches.match(e.request)
+    ) // end e.respondWith
+})
+
+
+// self.addEventListener('fetch', event => {
+//     var requestUrl = new URL(event.request.url);
+//
+//     if (requestUrl.origin === location.origin) {
+//         if (requestUrl.pathname === '/') {
+//             event.respondWith(caches.match('/index.html'));
+//             return;
+//         }
 //     }
+//
+//     event.respondWith(
+//         // ensure we check the *right* cache to match against
+//         caches.match(event.request).then(res => {
+//             return res || fetch(event.request)
+//         })
+//
+//     );
 // });
