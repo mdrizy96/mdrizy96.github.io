@@ -1,3 +1,5 @@
+import Database from './utils/idb';
+
 document.addEventListener('DOMContentLoaded', () => {
     const endpoint = 'https://free.currencyconverterapi.com/api/v5/currencies';
     const inputCurrency = document.querySelector('.currency_convert_from');
@@ -43,52 +45,71 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(myJson => {
                 const currencies = Object.keys(myJson.results).sort();
 
+                Database.IDB.addCurrencyArray('Currencies', currencies);
                 addCurrenciesToSelect(currencies);
             })
-            .catch(err =>
+            .catch(err => {
                 console.error(
-                    `The following error occured while getting currencies. ${err}`,
-                ),
+                        `The following error occurred while getting currencies. ${err}`,
+                    )
+
+                    // Get rates when user is offline
+                    Database.IDB.retrieve('Currencies').then(currencies => {
+                        if (typeof currencies === 'undefined') return;
+                        addCurrenciesToSelect(currencies);
+                    })
+                }
+
             );
     }
 
     // get conversion rates between currencies
-    function fetchCurrencyRate(url) {
+    function fetchCurrencyRate(url, queryString) {
         if (url === 'undefined') {
             return 'URL cannot be empty.';
         }
+        const inputAmount = getInput();
 
         fetch(url)
             .then(response => response.json())
             .then(myJson => {
-                const inputAmount = getInput();
+
                 const exchangeRate = Object.values(myJson);
+
+                Database.IDB.addCurrency('ExchangeRates', queryString, exchangeRate);
 
                 calculateExchangeRate(...exchangeRate, inputAmount);
             })
-            .catch(err =>
+            .catch(err => {
                 console.error(
                     `The following error occured while getting the conversion rate. ${err}`,
-                ),
+                );
+
+                // Get exchange rates when offline
+                Database.IDB.retrieve( 'ExchangeRates' , queryString).then(data => {
+                    if (typeof data === 'undefined') return;
+                    calculateExchangeRate(data, inputAmount);
+                })
+            }
+
             );
     }
 
     // api url from which to get conversion rates
-    function buildAPIUrl(currency1, currency2) {
-        if (arguments.length !== 2) {
-            return 'A source and destination currencies need to be provided to build the URL.';
-        }
+    function buildAPIUrl(queryString) {
 
-        return `https://free.currencyconverterapi.com/api/v5/convert?q=${currency1}_${currency2}&compact=ultra`;
+        const currencyUrl = `https://free.currencyconverterapi.com/api/v5/convert?q=${queryString}&compact=ultra`;
+        return currencyUrl;
     }
 
     // use selected currencies to get exchange rate
     function getExchangeRate() {
         const sourceCurrency = document.querySelector('.currency_convert_from').value;
         const destinationCurrency = document.querySelector('.currency_convert_to').value;
+        const currencyQueryString = `${sourceCurrency}_${destinationCurrency}`;
 
-        const url = buildAPIUrl(sourceCurrency, destinationCurrency);
-        fetchCurrencyRate(url);
+        const url = buildAPIUrl(currencyQueryString);
+        fetchCurrencyRate(url, currencyQueryString);
     }
 
     // calculate exchange rates using amount entered

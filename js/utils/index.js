@@ -8,6 +8,7 @@ function IDB() {
     this._dbPromise = this._setupDB();
 }
 
+
 IDB.prototype._setupDB = function () {
     if (!navigator.serviceWorker) {return Promise.reject();}
 
@@ -25,11 +26,20 @@ IDB.prototype._setupDB = function () {
 };
 
 
-IDB.prototype.add = function (dbStore, data) {
+IDB.prototype.addCurrencyArray = function (dbStore, data) {
     return this._dbPromise.then( function (db) {
         const tx = db.transaction(dbStore, 'readwrite');
         const store = tx.objectStore(dbStore);
         store.put(data);
+        return tx.complete;
+    });
+};
+
+IDB.prototype.addCurrency = function (dbStore, key, data) {
+    return this._dbPromise.then( function (db) {
+        const tx = db.transaction(dbStore, 'readwrite');
+        const store = tx.objectStore(dbStore);
+        data.forEach(currency => store.put(currency, key));
         return tx.complete;
     });
 };
