@@ -1,9 +1,5 @@
-// Chrome's currently missing some useful cache methods,
-// this polyfill adds them.
-importScripts('/js/lib/fetch-polyfill.js');
-
-var staticCacheName = 'converter-v1';
-var allCaches = [
+const staticCacheName = 'converter-v2';
+const allCaches = [
     staticCacheName
 ];
 // const cacheName = 'v1::static';
@@ -100,23 +96,3 @@ self.addEventListener('fetch', e => {
             }) // end caches.match(e.request)
     ) // end e.respondWith
 })
-
-
-// self.addEventListener('fetch', event => {
-//     var requestUrl = new URL(event.request.url);
-//
-//     if (requestUrl.origin === location.origin) {
-//         if (requestUrl.pathname === '/') {
-//             event.respondWith(caches.match('/index.html'));
-//             return;
-//         }
-//     }
-//
-//     event.respondWith(
-//         // ensure we check the *right* cache to match against
-//         caches.match(event.request).then(res => {
-//             return res || fetch(event.request)
-//         })
-//
-//     );
-// });

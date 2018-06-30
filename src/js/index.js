@@ -1,4 +1,4 @@
-import Database from './utils/idb';
+import Database from './utils/index';
 
 document.addEventListener('DOMContentLoaded', () => {
     const endpoint = 'https://free.currencyconverterapi.com/api/v5/currencies';
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return 'Currency cannot be empty.';
         }
 
-        let optionNode = document.createElement('option');
+        const optionNode = document.createElement('option');
         optionNode.innerText = currency;
 
         return optionNode;
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // add currency nodes to select elements
     function addCurrenciesToSelect(currencies) {
         if (currencies.length === 0 || currencies === 'undefined') {
-            return "Currencies cannot be empty.";
+            console.log("Currencies cannot be empty.");
         }
 
         currencies.map(currency => {
@@ -45,16 +45,18 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(myJson => {
                 const currencies = Object.keys(myJson.results).sort();
 
-                Database.IDB.addCurrencyArray('Currencies', currencies);
+
+                Database.addCurrencyArray('Currencies', currencies);
                 addCurrenciesToSelect(currencies);
+
             })
             .catch(err => {
-                console.error(
+                    console.error(
                         `The following error occurred while getting currencies. ${err}`,
                     )
 
                     // Get rates when user is offline
-                    Database.IDB.retrieve('Currencies').then(currencies => {
+                    Database.retrieve('Currencies').then(currencies => {
                         if (typeof currencies === 'undefined') return;
                         addCurrenciesToSelect(currencies);
                     })
@@ -76,21 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const exchangeRate = Object.values(myJson);
 
-                Database.IDB.addCurrency('ExchangeRates', queryString, exchangeRate);
+                Database.addCurrency('ExchangeRates', queryString, exchangeRate);
 
                 calculateExchangeRate(...exchangeRate, inputAmount);
             })
             .catch(err => {
-                console.error(
-                    `The following error occured while getting the conversion rate. ${err}`,
-                );
+                    console.error(
+                        `The following error occured while getting the conversion rate. ${err}`,
+                    );
 
-                // Get exchange rates when offline
-                Database.IDB.retrieve( 'ExchangeRates' , queryString).then(data => {
-                    if (typeof data === 'undefined') return;
-                    calculateExchangeRate(data, inputAmount);
-                })
-            }
+                    // Get exchange rates when offline
+                    Database.retrieve( 'ExchangeRates' , queryString).then(data => {
+                        if (typeof data === 'undefined') return;
+                        calculateExchangeRate(data, inputAmount);
+                    })
+                }
 
             );
     }
@@ -98,8 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // api url from which to get conversion rates
     function buildAPIUrl(queryString) {
 
-        const currencyUrl = `https://free.currencyconverterapi.com/api/v5/convert?q=${queryString}&compact=ultra`;
-        return currencyUrl;
+        return `https://free.currencyconverterapi.com/api/v5/convert?q=${queryString}&compact=ultra`;
     }
 
     // use selected currencies to get exchange rate
