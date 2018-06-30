@@ -5,20 +5,14 @@ import idb from './idb';
 // }
 
 const dbPromise = idb.open('converter', 1, upgradeDb => {
-    const CurrenciesStore = upgradeDb.createObjectStore('Currencies', {
-        keyPath: 'guid'
-    });
-    CurrenciesStore.createIndex('guid', 'guid');
-
-    const ExchangeRate = upgradeDb.createObjectStore('ExchangeRates', {
-        keyPath: 'guid'
-    });
-    ExchangeRate.createIndex('guid', 'guid');
-});
+            const CurrenciesStore = upgradeDb.createObjectStore('Currencies');
+            const ExchangeRate = upgradeDb.createObjectStore('ExchangeRates');
+    }
+);
 
 
 export default class Database {
-    static addCurrencyArray (dbStore, data) {
+    static addCurrencyArray (dbStore, key, data) {
         return dbPromise.then( db => {
             const tx = db.transaction(dbStore, 'readwrite');
             const store = tx.objectStore(dbStore);
@@ -31,17 +25,17 @@ export default class Database {
         return dbPromise.then( db => {
             const tx = db.transaction(dbStore, 'readwrite');
             const store = tx.objectStore(dbStore);
-            data.forEach(currency => store.put(currency, key));
+            data.forEach(currency => store.put(currency));
             return tx.complete;
         });
     };
 
-    static retrieve(dbStore, dbIndex) {
+    static retrieve(dbStore, key) {
         return dbPromise.then( db => {
             const tx = db.transaction(dbStore);
             const store = tx.objectStore(dbStore);
 
-            return store.get(dbIndex);
+            return store.get(key);
         });
     };
 

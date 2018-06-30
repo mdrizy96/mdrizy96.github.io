@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const currencies = Object.keys(myJson.results).sort();
 
 
-                Database.addCurrencyArray('Currencies', currencies);
+                Database.addCurrencyArray('Currencies', 'currenciesArray', currencies);
                 addCurrenciesToSelect(currencies);
 
             })
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     )
 
                     // Get rates when user is offline
-                    Database.retrieve('Currencies').then(currencies => {
+                    Database.retrieve('Currencies', 'currenciesArray').then(currencies => {
                         if (typeof currencies === 'undefined') return;
                         addCurrenciesToSelect(currencies);
                     })

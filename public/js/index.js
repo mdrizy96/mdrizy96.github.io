@@ -53,13 +53,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }).then(function (myJson) {
             var currencies = Object.keys(myJson.results).sort();
 
-            _index2.default.addCurrencyArray('Currencies', currencies);
+            _index2.default.addCurrencyArray('Currencies', 'currenciesArray', currencies);
             addCurrenciesToSelect(currencies);
         }).catch(function (err) {
             console.error('The following error occurred while getting currencies. ' + err);
 
             // Get rates when user is offline
-            _index2.default.retrieve('Currencies').then(function (currencies) {
+            _index2.default.retrieve('Currencies', 'currenciesArray').then(function (currencies) {
                 if (typeof currencies === 'undefined') return;
                 addCurrenciesToSelect(currencies);
             });
@@ -414,15 +414,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 // }
 
 var dbPromise = _idb2.default.open('converter', 1, function (upgradeDb) {
-    var CurrenciesStore = upgradeDb.createObjectStore('Currencies', {
-        keyPath: 'guid'
-    });
-    CurrenciesStore.createIndex('guid', 'guid');
-
-    var ExchangeRate = upgradeDb.createObjectStore('ExchangeRates', {
-        keyPath: 'guid'
-    });
-    ExchangeRate.createIndex('guid', 'guid');
+    var CurrenciesStore = upgradeDb.createObjectStore('Currencies');
+    var ExchangeRate = upgradeDb.createObjectStore('ExchangeRates');
 });
 
 var Database = function () {
@@ -432,7 +425,7 @@ var Database = function () {
 
     _createClass(Database, null, [{
         key: 'addCurrencyArray',
-        value: function addCurrencyArray(dbStore, data) {
+        value: function addCurrencyArray(dbStore, key, data) {
             return dbPromise.then(function (db) {
                 var tx = db.transaction(dbStore, 'readwrite');
                 var store = tx.objectStore(dbStore);
@@ -447,19 +440,19 @@ var Database = function () {
                 var tx = db.transaction(dbStore, 'readwrite');
                 var store = tx.objectStore(dbStore);
                 data.forEach(function (currency) {
-                    return store.put(currency, key);
+                    return store.put(currency);
                 });
                 return tx.complete;
             });
         }
     }, {
         key: 'retrieve',
-        value: function retrieve(dbStore, dbIndex) {
+        value: function retrieve(dbStore, key) {
             return dbPromise.then(function (db) {
                 var tx = db.transaction(dbStore);
                 var store = tx.objectStore(dbStore);
 
-                return store.get(dbIndex);
+                return store.get(key);
             });
         }
     }, {
