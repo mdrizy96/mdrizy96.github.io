@@ -8,6 +8,7 @@ var babelify = require('babelify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
+var deploy  = require('gulp-gh-pages');
 
 gulp.task('browser-sync', () => {
     browserSync.init({
@@ -53,6 +54,14 @@ gulp.task('build', ['js', 'idb'], () => {
     console.log('Building Project.');
 });
 
+/**
+ * Push build to gh-pages
+ */
+gulp.task('deploy', function () {
+  return gulp.src("./public/**/*")
+    .pipe(deploy())
+});
+
 
 // SERVER
 var connect = require('gulp-connect');
@@ -64,7 +73,7 @@ gulp.task('connect', function() {
 });
 
 // DEFAULT + WATCH
-gulp.task('default', ['connect', 'js'],() => {
+gulp.task('default', ['connect', 'deploy', 'js'],() => {
     console.log('Starting watch task');
     gulp.watch('index.html').on('change', browserSync.reload);
     // gulp.watch('src/css/styles.css', ['styles']).on('change', browserSync.reload);

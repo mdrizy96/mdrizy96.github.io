@@ -28,6 +28,7 @@
     "gulp-babel": "^7.0.1",
     "gulp-clean-css": "^3.9.4",
     "gulp-connect": "^5.5.0",
+    "gulp-gh-pages": "^0.5.4",
     "gulp-sourcemaps": "^2.6.4",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
